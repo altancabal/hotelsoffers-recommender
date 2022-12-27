@@ -2,201 +2,299 @@ from flask import Flask
 from flask_cors import CORS
 import os
 from notion_client import Client
-from notion_client.helpers import collect_paginated_api
-from datetime import datetime, timedelta
+from pprint import pprint
 
+import pandas as pd
 
-notion = Client(auth=os.environ["NOTION_TOKEN"])
+#notion = Client(auth=os.environ["NOTION_TOKEN"])
 
 app = Flask(__name__)
 CORS(app)
 
+#Google Sheets
+SHEET_ID = '1NjsxyTPkdM-5NmkLxjk_mRNdIi7S_qb4h1J525F-YeE'
+SHEET_NAME = 'Sheet1'
 
-#The Notion database "Promos compartidas" - https://www.notion.so/exploradordeviajes/459497a1b8f9438ebff5034915a943dd?v=8af7c0f4179f47a4b98b91ffa0980c25
-promos_compartidas_database_id = "459497a1-b8f9-438e-bff5-034915a943dd"
-#The Notion database "Ciudades" - https://www.notion.so/exploradordeviajes/da4ffb2a4aa04301bbf5bc0d40eff92c?v=7eb6bdb0d61b4c298baf4d44f392a74f
-ciudades_database_id = "da4ffb2a-4aa0-4301-bbf5-bc0d40eff92c"
-gratuitos_and_premium_name = "Gratuitos y Premium"
-prop_last_shared_date_premium = "Premium - Última fecha compartida"
-prop_last_shared_date_gratuitos = "Básica - Última fecha compartida"
+notion = Client(auth=os.environ["NOTION_TOKEN"])
+#The Notion database "Vuelos" - https://www.notion.so/exploradordeviajes/76dea96154c14c2e9ee606de094f0c9c?v=3af9e9b1a8724910a86bda1ac8e90b36
+vuelos_database_id = "76dea961-54c1-4c2e-9ee6-06de094f0c9c"
 
 
-#Gets the date one year ago
-def oneYearAgo():
-  # Get the current date
-  now = datetime.now()
-  # Calculate the date one year ago by subtracting a timedelta object
-  one_year_ago = now - timedelta(days=365)
-  return one_year_ago.strftime('%Y-%m-%d')
+###################################################
+## 1. FETCH PROMO INFORMATION FROM GOOGLE SHEETS ##
+###################################################
 
+def fetchRawPromosInformationFromGSheets():
+  url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}'
+  return pd.read_csv(url, names=["price","tipo","primerProveedor","maletasDeMano", "maletasFacturadas", "idaHoras", "idaAerolineas", "idaEscalas", "idaLugaresEscalas", "idaDuracion", "idaOrigenDestino", "vueltaHoras", "vueltaAerolineas", "vueltaEscalas", "vueltaLugaresEscalas", "vueltaDuracion", "vueltaOrigenDestino"])
+
+
+def getUuidRowNumbers(pd, column_name):
+  uuid_pattern = r'\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b'
+  # Create a boolean mask that indicates which rows contain a UUID in the 'price' column
+  mask = pd[column_name].str.contains(uuid_pattern)
+  # Get the row numbers for the rows that match the mask
+  row_numbers = pd[mask].index
+  return row_numbers 
+
+
+def formatPrice(price_str):
+  return int(price_str.replace('$', '').replace(' ', '').replace(',', ''))
+
+
+def formatCommaSeparatedValuesToArray(string):
+  array = [s.strip() for s in string.split(',')]
+  filtered_list = [x for x in array if x != 'nan'] #Remove all None values
+  return filtered_list
+
+
+def createFlightDataFromPandaRow(row):
+  row = row.copy()
   
-#Dates keepers
-oldest_day_limit = oneYearAgo() #The limit is a year ago
-last_date_city_shared_to_premium = {}
-last_date_city_shared_to_gratuitos = {}
-
-#####################################################################################
-### GET THE LAST DAYS WHERE A PROMO TO A CITY WAS SHARED TO GRATUITOS AND PREMIUM ###
-#####################################################################################
-promos_compartidas_database_query = {
-  "database_id": promos_compartidas_database_id,
-  "filter": {
-    "and": [
-      {
-        "property": "Fecha",
-        "date": {
-          "on_or_after": oldest_day_limit
-        }
-      }
-    ]
-  },
-  "sorts": [
-    {
-      "property": "Fecha",
-      "direction": "ascending"
-    }
-  ]
-}
+  row['price'] = formatPrice(row['price'])
+  row['maletasDeMano'] = row['maletasDeMano'].astype(int)
+  row['maletasFacturadas'] = row['maletasFacturadas'].astype(int)
+  row['idaAerolineas'] = row['idaAerolineas'].strip()
+  row['vueltaAerolineas'] = row['vueltaAerolineas'].strip()
+  row['idaLugaresEscalas'] = str(row['idaLugaresEscalas']).strip()
+  row['vueltaLugaresEscalas'] = str(row['vueltaLugaresEscalas']).strip()
+  row['idaDuracion'] = row['idaDuracion'].strip()
+  row['vueltaDuracion'] = row['vueltaDuracion'].strip()
+  row['idaEscalas'] = row['idaEscalas'].strip()
+  row['vueltaEscalas'] = row['vueltaEscalas'].strip()
+  
+  return row.to_dict()
 
 
-def updateCityAndDateMap(promo_audience, promo_city, promo_date):
-  if promo_audience == gratuitos_and_premium_name:
-    last_date_city_shared_to_gratuitos[promo_city] = promo_date
-    last_date_city_shared_to_premium[promo_city] = promo_date
-  else:
-    last_date_city_shared_to_premium[promo_city] = promo_date
+def getPromoDict(raw_pd, first_row, final_row):
+  promo = {}
+  promo["promo_id"] = raw_pd.iloc[first_row]['price'] #The first column is price
+  promo["kayak_url"] = raw_pd.iloc[first_row + 1]['price']
 
+  flights = []
+  for i in range(first_row + 2, min(final_row + 1, len(raw_pd))):
+    flight = createFlightDataFromPandaRow(raw_pd.iloc[i])
+    flights.append(flight)
 
-def keyIsPresentInList(key, dict):
-  return key in dict
-
-
-def mapLastSharedDate(promos):
-  for promo in promos:
-    curr_audiencia_select = promo["properties"]["Audiencia"]["select"]
-    if curr_audiencia_select is not None:
-      curr_promo_audiencia_name = curr_audiencia_select = promo["properties"]["Audiencia"]["select"]["name"]
-      curr_date = promo["properties"]["Fecha"]["date"]["start"]
-      ids = [obj['id'] for obj in promo["properties"]['🏙️ Ciudades']['relation']]
-      if len(ids) == 1:
-        updateCityAndDateMap(curr_promo_audiencia_name, ids[0], curr_date)
-      
-
-def mapLastSharedDateFromPromosCompartidas():
-    print("Getting dates from Promos Compartidas database...")
-    response = notion.databases.query(**{
-        "database_id": promos_compartidas_database_id,
-        "filter": {
-          "and": [
-            {
-              "property": "Fecha",
-              "date": {
-                "on_or_after": oldest_day_limit
-              }
-            }
-          ]
-        },
-        "sorts": [
-          {
-            "property": "Fecha",
-            "direction": "ascending"
-          }
-        ]
-      })
-    results = response["results"]
-    mapLastSharedDate(results)
-    print("Finished mapping all the dates. Found ", len(last_date_city_shared_to_premium), " dates for premium and ", len(last_date_city_shared_to_gratuitos), " for gratuitos.")
-
-
-########################################################################################################
-### UPDATE THE LAST SHARED DATE FOR PROMOS TO GRATUITOS AND PREMIUM IN THE CIUDADES NOTION DATABASE  ###
-########################################################################################################
-
-
-def update_last_gratuitos_shared_date(city_id, city_name, new_date):
-  print("Updating city", city_name, "with date", new_date, "for gratuitos...")
-  properties_to_update = {
-    prop_last_shared_date_gratuitos: {
-        "date": {
-            "start": new_date
-        }
-    }
+  return {
+    "promo_id": promo["promo_id"],
+    "kayak_url": promo["kayak_url"],
+    "flights": flights
   }
-  notion.pages.update(city_id, properties=properties_to_update)
-  print("City", city_name, "updated.")
-  
-  
-
-def check_gratuitos_date_for_city(city_id, city_name, city):
-  city_last_time_shared = city["properties"][prop_last_shared_date_gratuitos]["date"]
-  #If the city has never shared before
-  if city_last_time_shared is None:
-    #City has no last shared dates for Gratuitos, so it will be set to 1 year
-    update_last_gratuitos_shared_date(city_id, city_name, oldest_day_limit)
-  else:
-    city_last_time_shared = city["properties"][prop_last_shared_date_gratuitos]["date"]["start"]
-    #If the city has been shared to the gratuitos members in the last year
-    if city_id in last_date_city_shared_to_gratuitos:
-      if last_date_city_shared_to_gratuitos[city_id] == city_last_time_shared:
-        print("Dates are the same, so it is not going to be updated for Gratuitos")
-      else:
-        update_last_gratuitos_shared_date(city_id, city_name, last_date_city_shared_to_gratuitos[city_id])
-    else:
-      #City has not been shared to Gratuitos last year, so the date will be set to 1 year ago
-      update_last_gratuitos_shared_date(city_id, city_name, oldest_day_limit)
 
 
-def update_last_premium_shared_date(city_id, city_name, new_date):
-  print("Updating city", city_name, "with date", new_date, "for premium...")
-  properties_to_update = {
-    prop_last_shared_date_premium: {
-        "date": {
-            "start": new_date
-        }
-    }
-  }
-  notion.pages.update(city_id, properties=properties_to_update)
-  print("City", city_name, "updated.")
-
-
-def check_premium_date_for_city(city_id, city_name, city):
-  city_last_time_shared = city["properties"][prop_last_shared_date_premium]["date"]
-  #If the city has never shared before
-  if city_last_time_shared is None:
-    #City has no last shared dates for Premium, so it will be set to 1 year
-    update_last_premium_shared_date(city_id, city_name, oldest_day_limit)
-  else:
-    city_last_time_shared = city["properties"][prop_last_shared_date_premium]["date"]["start"]
-    #If the city has been shared to the premium members in the last year
-    if city_id in last_date_city_shared_to_premium:
-      if last_date_city_shared_to_premium[city_id] == city_last_time_shared:
-        print("Dates are the same, so it is not going to be updated for Premium")
-      else:
-        update_last_premium_shared_date(city_id, city_name, last_date_city_shared_to_premium[city_id])
-    else:
-      #City has not been shared to Premium last year, so the date will be set to 1 year ago
-      update_last_premium_shared_date(city_id, city_name, oldest_day_limit)
-
-
-def update_last_shared_dates_in_city(city):
-  city_id = city["id"]
-  city_name = city["properties"]["Name"]["title"][0]["text"]["content"]
-  print("===")
-  print("City", city_name)
-  check_gratuitos_date_for_city(city_id, city_name, city)
-  check_premium_date_for_city(city_id, city_name, city)
-  
-
-def update_last_shared_dates_in_ciudades():
-  print("Updating the Ciudades database with the last shared dates...")
-  for result in collect_paginated_api(notion.databases.query, database_id=ciudades_database_id):
-    update_last_shared_dates_in_city(result)
+def formatBestPromosDataFromPDAndUuidRowNumbers(raw_pd, uuid_row_numbers):
+  promos = []
+  for i in range(len(uuid_row_numbers)):
+    first_value = uuid_row_numbers[i]
+    last_value = len(raw_pd)
+    if (i + 1) < len(uuid_row_numbers):
+      last_value = uuid_row_numbers[i+1]-1
+    promo = getPromoDict(raw_pd, first_value, last_value)
+    promos.append(promo)
+  return promos
     
+
+def fetchPromosInformationFromGSheets():
+  raw_data_pd = fetchRawPromosInformationFromGSheets()
+  uuid_row_numbers = getUuidRowNumbers(raw_data_pd, 'price')
+  promos = formatBestPromosDataFromPDAndUuidRowNumbers(raw_data_pd, uuid_row_numbers)
+  return promos
+
+
+
+###########################################
+## 2. UPDDATE FLIGHTS IN VUELOS DATABASE ##
+###########################################
+
+def buildUpdateProperties(promo):
+  return {
+        "idaAerolineas": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["idaAerolineas"]
+                    }
+                }
+            ]
+        },
+        "idaDuracion": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["idaDuracion"]
+                    }
+                }
+            ]
+        },
+        "idaEscalas": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["idaEscalas"]
+                    }
+                }
+            ]
+        },
+        "idaHoras": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["idaHoras"]
+                    }
+                }
+            ]
+        },
+        "idaLugaresEscalas": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["idaLugaresEscalas"]
+                    }
+                }
+            ]
+        },
+        "idaOrigenDestino": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["idaOrigenDestino"]
+                    }
+                }
+            ]
+        },
+        "vueltaAerolineas": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["vueltaAerolineas"]
+                    }
+                }
+            ]
+        },
+        "vueltaDuracion": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["vueltaDuracion"]
+                    }
+                }
+            ]
+        },
+        "vueltaEscalas": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["vueltaEscalas"]
+                    }
+                }
+            ]
+        },
+        "vueltaHoras": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["vueltaHoras"]
+                    }
+                }
+            ]
+        },
+        "vueltaLugaresEscalas": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["vueltaLugaresEscalas"]
+                    }
+                }
+            ]
+        },
+        "vueltaOrigenDestino": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["vueltaOrigenDestino"]
+                    }
+                }
+            ]
+        },
+        "primerProveedor": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["primerProveedor"]
+                    }
+                }
+            ]
+        },
+        "tipo": {
+            "rich_text": [
+                {
+                    "type": "text",
+                    "text": {
+                        "content": promo["tipo"]
+                    }
+                }
+            ]
+        },
+        "maletasDeMano": {
+            "type": "number",
+            "number": promo["maletasDeMano"]
+        },
+        "maletasFacturadas": {
+            "type": "number",
+            "number": promo["maletasFacturadas"]
+        },
+        "price": {
+            "type": "number",
+            "number": promo["price"]
+        }
+    }
+
+
+def getBestFlight(flights):
+  best_flight = {}
+  lowest_flight_price = 5000 #Setting a maximum of $5000 for a flight
+  for flight in flights:
+    if flight["price"] < lowest_flight_price:
+      lowest_flight_price = flight["price"]
+      best_flight = flight
+
+  return best_flight
+    
+
+def updateVuelosDatabaseWithPromos(promos):
+  for promo in promos:
+    best_flight = getBestFlight(promo["flights"])
+    update_properties = buildUpdateProperties(best_flight)
+    print("---")
+    print("PATCH " + "https://api.notion.com/v1/pages/" + promo["promo_id"])
+    notion.pages.update(page_id=promo["promo_id"], properties=update_properties)
+    #print(update_properties)
+
 
 @app.route('/')
 def index():
-  mapLastSharedDateFromPromosCompartidas()
-  update_last_shared_dates_in_ciudades()
+  return {"message": "Use the /migrate endpoint to migrate the data from Google Sheets to Notion"}
+
+
+@app.route('/migrate')
+def migrate():
+  promos = fetchPromosInformationFromGSheets()
+  print(len(promos))
+  updateVuelosDatabaseWithPromos(promos)
   return {"status":200}
 
 
