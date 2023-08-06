@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mejor Hotel</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <div id="hotel" class="card horizontal">
+      <div class="card-image">
+        <img id="hotel-img">
+      </div>
+      <div class="card-stacked">
+        <div class="card-content">
+          <span id="hotel-name" class="card-title"></span>
+          <span id="hotel-rating" class="rating"></span>
+          <div class="details">
+            <p id="hotel-price"></p>
+            <p id="hotel-opinion"></p>
+            <p id="hotel-location"></p>
+          </div>
+        </div>
+        <div class="card-action">
+          <a id="hotel-url">Reserva ahora</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

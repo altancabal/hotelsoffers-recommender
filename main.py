@@ -1,7 +1,6 @@
-from flask import Flask
+from flask import Flask, render_template, Response
 from flask_cors import CORS
 from replit import db
-from flask import Response
 from bs4 import BeautifulSoup
 
 import pandas as pd
@@ -114,7 +113,7 @@ def serialize(obj):
 
 @app.route('/')
 def index():
-  return {"message": "Use the /get-top-hotel /update endpoint."}
+    return render_template('index.html')
 
 
 @app.route('/get-top-hotel')
@@ -147,5 +146,7 @@ def update():
   db["tophotel"] = top5HotelDetails[0]
   
   return {"status":200}
+
+
 
 app.run(host='0.0.0.0', port=81)
