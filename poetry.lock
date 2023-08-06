@@ -69,6 +69,32 @@ tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)"
 tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "mypy (>=0.900,!=0.940)", "pytest-mypy-plugins", "cloudpickle"]
 
 [[package]]
+name = "beautifulsoup4"
+version = "4.12.2"
+description = "Screen-scraping library"
+category = "main"
+optional = false
+python-versions = ">=3.6.0"
+
+[package.dependencies]
+soupsieve = ">1.2"
+
+[package.extras]
+html5lib = ["html5lib"]
+lxml = ["lxml"]
+
+[[package]]
+name = "bs4"
+version = "0.0.1"
+description = "Dummy package for Beautiful Soup"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+beautifulsoup4 = "*"
+
+[[package]]
 name = "cachetools"
 version = "5.2.0"
 description = "Extensible memoizing collections and decorators"
@@ -380,6 +406,25 @@ signals = ["blinker (>=1.4.0)"]
 signedtoken = ["cryptography (>=3.0.0)", "pyjwt (>=2.0.0,<3)"]
 
 [[package]]
+name = "openai"
+version = "0.27.8"
+description = "Python client library for the OpenAI API"
+category = "main"
+optional = false
+python-versions = ">=3.7.1"
+
+[package.dependencies]
+aiohttp = "*"
+requests = ">=2.20"
+tqdm = "*"
+
+[package.extras]
+datalib = ["numpy", "pandas (>=1.2.3)", "pandas-stubs (>=1.1.0.11)", "openpyxl (>=3.0.7)"]
+dev = ["black (>=21.6b0,<22.0.0)", "pytest (>=6.0.0,<7.0.0)", "pytest-asyncio", "pytest-mock"]
+embeddings = ["scikit-learn (>=1.0.2)", "tenacity (>=8.0.1)", "matplotlib", "plotly", "numpy", "scipy", "pandas (>=1.2.3)", "pandas-stubs (>=1.1.0.11)", "openpyxl (>=3.0.7)"]
+wandb = ["wandb", "numpy", "pandas (>=1.2.3)", "pandas-stubs (>=1.1.0.11)", "openpyxl (>=3.0.7)"]
+
+[[package]]
 name = "packaging"
 version = "21.3"
 description = "Core utilities for Python packages"
@@ -495,7 +540,7 @@ test = ["pylint", "pycodestyle", "pyflakes", "pytest", "pytest-cov", "coverage"]
 
 [[package]]
 name = "python-lsp-server"
-version = "1.6.0"
+version = "1.7.4"
 description = "Python Language Server for the Language Server Protocol"
 category = "dev"
 optional = false
@@ -505,26 +550,26 @@ python-versions = ">=3.7"
 docstring-to-markdown = "*"
 jedi = ">=0.17.2,<0.19.0"
 pluggy = ">=1.0.0"
-pyflakes = {version = ">=2.5.0,<2.6.0", optional = true, markers = "extra == \"pyflakes\""}
+pyflakes = {version = ">=2.5.0,<3.1.0", optional = true, markers = "extra == \"pyflakes\""}
 python-lsp-jsonrpc = ">=1.0.0"
-rope = {version = ">0.10.5", optional = true, markers = "extra == \"rope\""}
+rope = {version = ">1.2.0", optional = true, markers = "extra == \"rope\""}
 ujson = ">=3.0.0"
 whatthepatch = {version = ">=1.0.2,<2.0.0", optional = true, markers = "extra == \"yapf\""}
-yapf = {version = "*", optional = true, markers = "extra == \"yapf\""}
+yapf = {version = ">=0.33.0", optional = true, markers = "extra == \"yapf\""}
 
 [package.extras]
-all = ["autopep8 (>=1.6.0,<1.7.0)", "flake8 (>=5.0.0,<5.1.0)", "mccabe (>=0.7.0,<0.8.0)", "pycodestyle (>=2.9.0,<2.10.0)", "pydocstyle (>=2.0.0)", "pyflakes (>=2.5.0,<2.6.0)", "pylint (>=2.5.0)", "rope (>=0.10.5)", "yapf", "whatthepatch"]
-autopep8 = ["autopep8 (>=1.6.0,<1.7.0)"]
-flake8 = ["flake8 (>=5.0.0,<5.1.0)"]
+all = ["autopep8 (>=1.6.0,<2.1.0)", "flake8 (>=5.0.0,<7)", "mccabe (>=0.7.0,<0.8.0)", "pycodestyle (>=2.9.0,<2.11.0)", "pydocstyle (>=6.3.0,<6.4.0)", "pyflakes (>=2.5.0,<3.1.0)", "pylint (>=2.5.0,<3)", "rope (>1.2.0)", "yapf (>=0.33.0)", "whatthepatch (>=1.0.2,<2.0.0)"]
+autopep8 = ["autopep8 (>=1.6.0,<2.1.0)"]
+flake8 = ["flake8 (>=5.0.0,<7)"]
 mccabe = ["mccabe (>=0.7.0,<0.8.0)"]
-pycodestyle = ["pycodestyle (>=2.9.0,<2.10.0)"]
-pydocstyle = ["pydocstyle (>=2.0.0)"]
-pyflakes = ["pyflakes (>=2.5.0,<2.6.0)"]
-pylint = ["pylint (>=2.5.0)"]
-rope = ["rope (>0.10.5)"]
-test = ["pylint (>=2.5.0)", "pytest", "pytest-cov", "coverage", "numpy", "pandas", "matplotlib", "pyqt5", "flaky"]
+pycodestyle = ["pycodestyle (>=2.9.0,<2.11.0)"]
+pydocstyle = ["pydocstyle (>=6.3.0,<6.4.0)"]
+pyflakes = ["pyflakes (>=2.5.0,<3.1.0)"]
+pylint = ["pylint (>=2.5.0,<3)"]
+rope = ["rope (>1.2.0)"]
+test = ["pylint (>=2.5.0,<3)", "pytest", "pytest-cov", "coverage", "numpy", "pandas", "matplotlib", "pyqt5", "flaky"]
 websockets = ["websockets (>=10.3)"]
-yapf = ["yapf", "whatthepatch (>=1.0.2,<2.0.0)"]
+yapf = ["yapf (>=0.33.0)", "whatthepatch (>=1.0.2,<2.0.0)"]
 
 [[package]]
 name = "pytoolconfig"
@@ -665,6 +710,14 @@ optional = false
 python-versions = ">=3.7"
 
 [[package]]
+name = "soupsieve"
+version = "2.4.1"
+description = "A modern CSS selector implementation for Beautiful Soup."
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[[package]]
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
@@ -679,6 +732,23 @@ description = "A lil' TOML parser"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
+
+[[package]]
+name = "tqdm"
+version = "4.65.0"
+description = "Fast, Extensible Progress Meter"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+colorama = {version = "*", markers = "platform_system == \"Windows\""}
+
+[package.extras]
+dev = ["py-make (>=0.1.0)", "twine", "wheel"]
+notebook = ["ipywidgets (>=6)"]
+slack = ["slack-sdk"]
+telegram = ["requests"]
 
 [[package]]
 name = "typing-extensions"
@@ -733,11 +803,14 @@ python-versions = "*"
 
 [[package]]
 name = "yapf"
-version = "0.32.0"
+version = "0.33.0"
 description = "A formatter for Python code."
 category = "dev"
 optional = false
 python-versions = "*"
+
+[package.dependencies]
+tomli = ">=2.0.1"
 
 [[package]]
 name = "yarl"
@@ -766,7 +839,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8.0,<3.9"
-content-hash = "47db05074a90761e85153497c1c7d9622a47f7dd63b6082d1f1379df15e6211b"
+content-hash = "a043adbee90594ce902124ddee30883ab056db75d0ca023290281532a206cbfd"
 
 [metadata.files]
 aiohttp = []
@@ -774,6 +847,8 @@ aiosignal = []
 anyio = []
 async-timeout = []
 attrs = []
+beautifulsoup4 = []
+bs4 = []
 cachetools = []
 certifi = []
 charset-normalizer = []
@@ -801,6 +876,7 @@ multidict = []
 notion-client = []
 numpy = []
 oauthlib = []
+openai = []
 packaging = []
 pandas = []
 parso = []
@@ -823,8 +899,10 @@ rsa = []
 six = []
 sklearn = []
 sniffio = []
+soupsieve = []
 toml = []
 tomli = []
+tqdm = []
 typing-extensions = []
 ujson = []
 urllib3 = []
