@@ -50,8 +50,6 @@ def formatCommaSeparatedValuesToArray(string):
 
 def createFlightDataFromPandaRow(row):
   row = row.copy()
-  print("row")
-  print(row)
   
   row['price'] = formatPrice(row['price'])
   row['maletasDeMano'] = row['maletasDeMano'].astype(int)
