@@ -84,7 +84,7 @@ def getTopRecommendedHotel(hotels_data):
     model="gpt-4-0613",
     temperature=0,
     messages=[
-      {"role": "system", "content": "From the following lis of hotels, return a sorted array with the IDs of the top 5 hotels that you believe (based on what you already know from those hotels and the list I am sharing here) are the preffered by Costa Ricans to stay between the dates 2023-08-11 and 2023-08-13. Today is 2023-08-06. The format must be [id1,id2,id3,id4,id5]" + hotels_data}
+      {"role": "system", "content": "From the following list of hotels, return a sorted array with the IDs of the top 5 hotels that you believe (based on what you already know from those hotels and the list I am sharing here) are the preffered by Costa Ricans to stay between the dates 2023-08-11 and 2023-08-13. Today is 2023-08-06. The format must be [id1,id2,id3,id4,id5]" + hotels_data}
     ]
   )
   
