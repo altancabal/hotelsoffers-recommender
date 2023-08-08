@@ -9,6 +9,22 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <div id="loadingScreen" style="position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 100; background-color: rgba(255, 255, 255, 1); display: flex; justify-content: center; align-items: center; transition: all 0.3s;">
+    <div style="text-align: center;">
+        <div class="preloader-wrapper big active">
+            <div class="spinner-layer spinner-blue-only">
+                <div class="circle-clipper left">
+                    <div class="circle"></div>
+                </div><div class="gap-patch">
+                    <div class="circle"></div>
+                </div><div class="circle-clipper right">
+                    <div class="circle"></div>
+                </div>
+            </div>
+        </div>
+        <p>Buscando el mejor hotel disponible...</p>
+    </div>
+  </div>
   <div class="container">
     <div id="hotel" class="card horizontal">
       <div class="card-image">
@@ -29,6 +45,19 @@
         </div>
       </div>
     </div>
+    <div id="kayakWidget3"
+        data-affiliate-id="explorador"
+        data-country-code="cr"
+        data-vertical="hotels"
+        data-vertical-list="hotels,flights,cars"
+        data-language-code="es"
+        data-currency-code="USD"
+        data-location-id="home_page"
+        data-fill-trip-type="2"
+        data-fill-location-from="GEOIP"
+        data-fill-location-to="Costa Rica"
+        ></div>
+        <script src="https://www.kayak.com/search-widget/script/direct/kayakWidget3"></script>
   </div>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
