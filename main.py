@@ -2,12 +2,14 @@ from flask import Flask, render_template, Response
 from flask_cors import CORS
 from replit import db
 from bs4 import BeautifulSoup
+from datetime import datetime
 
 import pandas as pd
 import uuid
 import openai
 import os
 import json
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -44,6 +46,13 @@ def createHotelDataFromPandaRow(row):
   row['url'] = row['url'].strip()
   row['rating'] = row['rating'].strip()
 
+  # extract dates  
+  url = row['url'].strip()
+  dates = re.search('/(\d{4}-\d{2}-\d{2})/(\d{4}-\d{2}-\d{2})/', url)
+  if dates:
+    row['start_date'] = dates.group(1)
+    row['end_date'] = dates.group(2)
+  
   img_html = row.get('img_html', '')
   if isinstance(img_html, str):
       soup = BeautifulSoup(img_html, 'html.parser')
@@ -79,12 +88,13 @@ def fetchHotelsInformationFromGSheets():
   return promos
 
 
-def getTopRecommendedHotel(hotels_data):
+def getTopRecommendedHotel(hotels_data, start_date, end_date):
+  today_date = datetime.today().strftime('%Y-%m-%d')
   completion = openai.ChatCompletion.create(
     model="gpt-4-0613",
     temperature=0,
     messages=[
-      {"role": "system", "content": "From the following list of hotels, return a sorted array with the IDs of the top 5 hotels that you believe (based on what you already know from those hotels and the list I am sharing here) are the preffered by Costa Ricans to stay between the dates 2023-08-11 and 2023-08-13. Today is 2023-08-06. The format must be [id1,id2,id3,id4,id5]" + hotels_data}
+      {"role": "system", "content": "From the following list of hotels, return a sorted array with the IDs of the top 5 hotels that you believe (based on what you already know from those hotels and the list I am sharing here) are the preffered by Costa Ricans to stay between the dates " + start_date + " and " + end_date + ". Today is " + today_date + ". The format must be [id1,id2,id3,id4,id5]" + hotels_data}
     ]
   )
   
@@ -126,10 +136,14 @@ def getTopHotel():
 @app.route('/update')
 def update():
   hotels = fetchHotelsInformationFromGSheets()
+
+  start_date_of_first_hotel = hotels[0]['start_date']
+  end_date_of_first_hotel = hotels[0]['end_date']
+
   #print("HOTELS")
   #print(hotels)
   hotel_list_text = createHotelString(hotels)
-  top5Hotels = getTopRecommendedHotel(hotel_list_text)
+  top5Hotels = getTopRecommendedHotel(hotel_list_text, start_date_of_first_hotel, end_date_of_first_hotel)
   #print("TOP5HOTELS")
   #print(top5Hotels)
   
