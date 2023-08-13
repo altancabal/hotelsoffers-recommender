@@ -2,6 +2,7 @@ from datetime import datetime
 
 import json
 import openai
+import utils
 
 def getTop5RecommendedHotels(hotels):
     if not hotels or 'start_date' not in hotels[0] or 'end_date' not in hotels[0]:
@@ -11,7 +12,9 @@ def getTop5RecommendedHotels(hotels):
     end_date_of_first_hotel = hotels[0]['end_date']
 
     hotel_list_text = utils.createHotelString(hotels)
-    top5Hotels = hotel_recommender.getTopRecommendedHotel(hotel_list_text, start_date_of_first_hotel, end_date_of_first_hotel)
+    top5Hotels = getTopRecommendedHotelFromGPT(hotel_list_text, start_date_of_first_hotel, end_date_of_first_hotel)
+
+    return top5Hotels
 
 
 def getTopRecommendedHotelFromGPT(hotels_str, start_date, end_date):
@@ -25,6 +28,10 @@ def getTopRecommendedHotelFromGPT(hotels_str, start_date, end_date):
   )
   
   content = completion.choices[0].message['content']
+
+  print("GPT RESPONSE")
+  print(content)
+  
   uuid_list = json.loads(content)
 
   return uuid_list
