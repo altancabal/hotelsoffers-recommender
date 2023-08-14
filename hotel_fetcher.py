@@ -33,6 +33,12 @@ def createHotelDataFromPandaRow(row):
   row['url'] = row['url'].strip()
   row['rating'] = row['rating'].strip()
 
+  # Modify URL
+  base_url = "https://www.kayak.co.cr/in?a=explorador&enc_pid=deeplinks&url="
+  match = re.search('/hotels/.+', row['url'])
+  if match:
+      row['url'] = base_url + match.group(0)
+  
   # extract dates  
   url = row['url'].strip()
   dates = re.search('/(\d{4}-\d{2}-\d{2})/(\d{4}-\d{2}-\d{2})/', url)

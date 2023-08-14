@@ -1,8 +1,10 @@
 from flask import Flask
 from flask_cors import CORS
+
 import os
 import openai
 
+#Flask application
 app = Flask(__name__)
 CORS(app)
 
@@ -12,3 +14,5 @@ SHEET_NAME = 'playasguanacaste'
 
 #OpenAI
 openai.api_key = os.environ.get("OPENAI_API_KEY")
+
+#Notion

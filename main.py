@@ -2,12 +2,9 @@
 from config import app
 from flask import render_template, Response
 
-import json
-import pandas as pd
-
 #Local imports
-import config
 import hotel_fetcher
+import hotel_price_storer
 import hotel_recommender
 import utils
 
@@ -29,19 +26,36 @@ def getTopHotel():
 
 @app.route('/update')
 def update():
+  if hotel_price_storer.already_stored_today():
+      return {"status": 208, "message": "Hotel already stored today. Skipping update."}
+  
   #Fetch full cleaned list of hotels
-  hotels = hotel_fetcher.fetchHotelsInformationFromGSheets()
+  full_list_hotels = hotel_fetcher.fetchHotelsInformationFromGSheets()
+  hotels_last_two_weeks = hotel_price_storer.get_hotels_from_last_two_weeks()
+  hotels = [hotel for hotel in full_list_hotels if hotel["name"] not in hotels_last_two_weeks]
 
+  # Sort the hotels list by price in ascending order and keep the first 100
+  hotels = sorted(hotels, key=lambda x: x['price'])[:100]
+  
+  print("Size of full_list_hotels:", len(full_list_hotels))
+  print("Size of hotels_last_two_weeks:", len(hotels_last_two_weeks))
+  print("Size of filtered hotels:", len(hotels))
+    
   #Get the top 5 hotels
   top5HotelIDs = hotel_recommender.getTop5RecommendedHotels(hotels)
-
+  
   #Map the top hotel IDs with their details
-  top5HotelDetails = [hotel for hotel in hotels if hotel['uuid'] in top5HotelIDs]
+  top5HotelDetails = [next(hotel for hotel in hotels if hotel['uuid'] == uuid) for uuid in top5HotelIDs]
 
   if top5HotelDetails:
-      utils.save_to_db(TOP_HOTEL_KEY, top5HotelDetails[0])
+    # Check if a hotel has been stored today
+    top_hotel = top5HotelDetails[0]
+    print("THE TOP HOTEL IS")
+    print(top_hotel)
+    utils.save_to_db(TOP_HOTEL_KEY, top_hotel)
+    hotel_price_storer.store_hotel(top_hotel)
 
-  return {"status": 200}
+  return {"status": 200, "message": "Hotel updated successfully."}
 
 
 
