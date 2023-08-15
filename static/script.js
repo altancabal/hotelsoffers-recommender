@@ -13,6 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById("hotel-location").innerText = `Ubicación: ${data.location}`;
                 document.getElementById("hotel-url").href = data.url;
                 document.getElementById("hotel-url").target = "_blank";
+                document.getElementById("hotel-start-date").innerText = `Día inicio: ${data.start_date}`;
+                document.getElementById("hotel-end-date").innerText = `Día final: ${data.end_date}`;
 
                 loadingScreen.style.opacity = '0';
                 loadingScreen.style.pointerEvents = 'none';
