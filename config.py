@@ -15,4 +15,5 @@ SHEET_NAME = 'costarica'
 #OpenAI
 openai.api_key = os.environ.get("OPENAI_API_KEY")
 
-#Notion
+#Price
+PRICE_LIMIT = 200

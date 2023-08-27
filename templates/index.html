@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+  <img id="logo" src="{{ url_for('static', filename='exploradordeviajes.png') }}" alt="Explorador de Viajes">
+  <h1 id="centered-title">Hotel del Día</h1>
   <div id="loadingScreen" style="position: fixed; left: 0; top: 0; width: 100%; height: 100%; z-index: 100; background-color: rgba(255, 255, 255, 1); display: flex; justify-content: center; align-items: center; transition: all 0.3s;">
     <div style="text-align: center;">
         <div class="preloader-wrapper big active">
@@ -43,7 +45,27 @@
           </div>
         </div>
         <div class="card-action">
-          <a id="hotel-url">Reserva ahora</a>
+          <a id="hotel-url" class="btn btn-custom">Reserva ahora</a>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">¿Cómo funciona nuestro sistema?</span>
+        <p>En Explorador de Viajes monitoreamos constantemente una amplia gama de hoteles en Costa Rica, recolectando datos como precios, ubicación, opiniones de los huéspedes y más. Nuestro avanzado sistema de inteligencia artificial analiza estos datos para seleccionar la mejor opción de hotel para ti. De esta manera, siempre te garantizamos una estancia cómoda, segura y económica.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">¿Por qué a veces la oferta no está disponible o el precio es diferente?</span>
+        <p>Las ofertas y precios de hoteles pueden cambiar rápidamente debido a diversos factores como disponibilidad, demanda y promociones especiales. Nuestro sistema actualiza la información con la mayor frecuencia posible, pero hay ocasiones en las que la oferta seleccionada puede haberse agotado o cambiado antes de que puedas realizar la reserva.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">¿Interesado en visitar el mismo hotel en diferentes fechas o buscar un destino distinto?</span>
+        <div class="card-action">
+          <a href="https://www.kayak.co.cr/in?a=explorador&enc_pid=deeplinks&url=/hotels/" target="_blank" class="btn btn-custom">Buscar hoteles aquí</a>
         </div>
       </div>
     </div>

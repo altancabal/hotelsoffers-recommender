@@ -46,3 +46,33 @@ body {
   background-color: #4caf50;
   border-radius: 8px;
 }
+
+.card-content {
+  padding: 20px;
+  font-size: 1em;
+}
+
+.card-title {
+  font-size: 1.5em;
+  margin-bottom: 20px;
+}
+
+.btn-custom {
+  background-color: #ff652f;
+  color: #fff;
+}
+
+#logo {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 50px;
+  z-index: 101;  /* Makes sure the logo is above other elements */
+}
+
+#centered-title {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 2em;
+  font-weight: bold;
+}

@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
-from config import SHEET_ID, SHEET_NAME
+from config import SHEET_ID, SHEET_NAME, PRICE_LIMIT
+from datetime import datetime
 
 import pandas as pd
 import re
@@ -14,56 +15,57 @@ def fetchHotelsInformationFromGSheets():
 
 def fetchRawPromosInformationFromGSheets():
   url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}'
-  return pd.read_csv(url, names=["name", "price", "opinion_count", "location", "top_provider", "url", "rating", "img_html"])
+  return pd.read_csv(url, names=["name", "price", "opinion_count", "location", "top_provider", "url", "rating", "img_html", "fetched_date"])
 
 
 def formatPrice(price_str):
-  return int(price_str.replace('$', '').replace(' ', '').replace(',', ''))
+  return int(price_str.replace('$', '').replace(' ', '').replace(',', '').replace('.', '').replace('*', ''))
+
+
+def extract_alt_with_regex(html_content):
+    # Modified regex to account for escaped quotes and capture content within
+    alt_pattern = r'alt\\s*=\\s*\\"([^\\"]+)\\"'
+    match = re.search(alt_pattern, html_content)
+    return match.group(1) if match else ""
 
 
 def createHotelDataFromPandaRow(row):
-  row = row.copy()
+    row = row.copy()
+    row['uuid'] = str(uuid.uuid4())
+    row['price'] = formatPrice(row['price'])
+    
+    fields_to_strip = ['name', 'opinion_count', 'location', 'top_provider', 'url', 'rating']
+    for field in fields_to_strip:
+        row[field] = row[field].strip()
 
-  row['uuid'] = str(uuid.uuid4())
-  row['price'] = formatPrice(row['price'])
-  row['name'] = row['name'].strip()
-  row['opinion_count'] = row['opinion_count'].strip()
-  row['location'] = row['location'].strip()
-  row['top_provider'] = row['top_provider'].strip()
-  row['url'] = row['url'].strip()
-  row['rating'] = row['rating'].strip()
+    # Modify URL
+    base_url = "https://www.kayak.co.cr/in?a=explorador&enc_pid=deeplinks&url="
+    match = re.search('/hotels/.+', row['url'])
+    if match:
+        row['url'] = base_url + match.group(0)
 
-  # Modify URL
-  base_url = "https://www.kayak.co.cr/in?a=explorador&enc_pid=deeplinks&url="
-  match = re.search('/hotels/.+', row['url'])
-  if match:
-      row['url'] = base_url + match.group(0)
-  
-  # extract dates  
-  url = row['url'].strip()
-  dates = re.search('/(\d{4}-\d{2}-\d{2})/(\d{4}-\d{2}-\d{2})/', url)
-  if dates:
-    row['start_date'] = dates.group(1)
-    row['end_date'] = dates.group(2)
-  
-  img_html = row.get('img_html', '')
-  if isinstance(img_html, str):
-      soup = BeautifulSoup(img_html, 'html.parser')
-      img_tag = soup.find('img')
-      if img_tag:
-          row['img_url'] = img_tag['src']
-          
-          # Extract the "alt" attribute and assign it to 'name'
-          #The content of 'alt' has better quality than name
-          alt_text = img_tag.get('alt', '').strip()
-          if alt_text:
-              row['name'] = alt_text
+    # Extract dates  
+    dates = re.search('/(\d{4}-\d{2}-\d{2})/(\d{4}-\d{2}-\d{2})/', row['url'])
+    if dates:
+        row['start_date'] = dates.group(1)
+        row['end_date'] = dates.group(2)
 
-  # Delete the 'image_url' key
-  if 'img_html' in row:
-      del row['img_html']
-  
-  return row.to_dict()
+    img_html = row.get('img_html', '')
+    if isinstance(img_html, str):
+        formatted_html = img_html.replace('\\"', '"')  # Convert escaped quotes to actual quotes
+        soup = BeautifulSoup(formatted_html, 'html.parser')
+        img_tag = soup.find('img')
+        if img_tag:
+            row['img_url'] = img_tag.get('src', '')  # No need to replace quotes as we already did that
+            alt_text = img_tag.get('alt')
+            if alt_text:
+                row['name'] = alt_text
+
+    # Delete the 'image_url' key
+    if 'img_html' in row:
+        del row['img_html']
+
+    return row.to_dict()
 
 
 def getHotelDict(raw_pd):
@@ -86,7 +88,7 @@ def getHotelDict(raw_pd):
 
 def is_valid_row(row):
     # List of required fields
-    required_fields = ["name", "price", "opinion_count", "location", "top_provider", "url", "rating", "img_html"]
+    required_fields = ["name", "price", "opinion_count", "location", "top_provider", "url", "rating", "img_html", "fetched_date"]
     
     # Check if each field exists and is not empty
     for field in required_fields:
@@ -100,6 +102,11 @@ def is_valid_row(row):
 
         # Specific check for the price field
         if field == "price" and not str(row[field]).startswith('$'):
+            return False
+        if field == "price" and formatPrice(row[field]) > PRICE_LIMIT:
+            return False
+
+        if field == "fetched_date" and row[field] != datetime.today().strftime('%Y-%m-%d'):
             return False
 
     return True

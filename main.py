@@ -40,7 +40,9 @@ def update():
   print("Size of full_list_hotels:", len(full_list_hotels))
   print("Size of hotels_last_two_weeks:", len(hotels_last_two_weeks))
   print("Size of filtered hotels:", len(hotels))
-    
+
+  #print(hotels)
+  
   #Get the top 5 hotels
   top5HotelIDs = hotel_recommender.getTop5RecommendedHotels(hotels)
   
