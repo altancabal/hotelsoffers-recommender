@@ -42,8 +42,7 @@
           </div>
           <div class="details">
             <p id="hotel-location"></p>
-            <p id="hotel-start-date"></p>
-            <p id="hotel-end-date"></p>
+            <p id="hotel-dates"></p>
           </div>
         </div>
         <div class="card-action">
@@ -72,6 +71,12 @@
         </div>
       </li>
       <li>
+        <div class="collapsible-header"><span class="card-title">¿Ustedes hacen las reservas de los hospedajes?</span></div>
+        <div class="collapsible-body">
+          <span>Al igual que con las <a href="https://exploradordeviajes.com/" target="_blank">ofertas de vuelos</a>, nosotros <strong>no</strong> vendemos ni reservamos ofertas de hospedaje, solamente monitoreamos y te compartimos cuando nuestro sistema de inteligencia artifical encuentra una buena promoción para ti. Usualmente compartimos enlaces en comparadores de hospedaje para que tú puedas elegir la empresa con la que deseas reservar el hospedaje,</span>
+        </div>
+      </li>
+      <li>
         <div class="collapsible-header"><span class="card-title">¿Interesado(a) en visitar el mismo hotel en diferentes fechas o buscar un destino distinto?</span></div>
         <div class="collapsible-body">
           <div class="card-action">
@@ -81,7 +86,12 @@
         </div>
       </li>
     </ul>
-    
+    <footer>
+      <div class="footer-content">
+        <p>Explorador de Viajes</p>
+        <a href="https://exploradordeviajes.com/terminos-y-condiciones-de-uso/" target="_blank">Términos y condiciones de uso</a>
+      </div>
+    </footer>
   </div>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>

@@ -226,3 +226,24 @@ body {
 #hotel {
   margin-bottom: 3em; /* Adjust as necessary */
 }
+
+/* Footer styles */
+footer {
+  margin-top: 1em;
+  padding: 1em;
+  background-color: white;
+  color: #333;
+}
+
+.footer-content {
+  text-align: center;
+}
+
+.footer-content a {
+  color: #333;
+  text-decoration: underline;
+}
+
+.footer-content a:hover {
+  color: #ff652f;
+}

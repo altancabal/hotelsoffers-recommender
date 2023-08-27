@@ -10,13 +10,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById("hotel-rating").innerText = `${data.rating}`;
                 document.getElementById("hotel-opinion").innerText = `Basado en ${data.opinion_count}`;
                 document.getElementById("hotel-price-value").innerText = `$${data.price}`;
-                document.getElementById("hotel-location").innerText = `Ubicación: ${data.location}`;
+                document.getElementById("hotel-location").innerText = `Ubicado en ${data.location}`;
                 document.getElementById("hotel-url").href = data.url;
                 document.getElementById("hotel-url").target = "_blank";
                 document.getElementById("more-images-link").href = data.url;
                 document.getElementById("more-images-link").target = "_blank";
-                document.getElementById("hotel-start-date").innerText = `Día inicio: ${data.start_date}`;
-                document.getElementById("hotel-end-date").innerText = `Día final: ${data.end_date}`;
+
+                // Convert dates to Spanish text representation
+                const startDate = new Date(data.start_date);
+                const endDate = new Date(data.end_date);
+                const startDateStr = startDate.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                const endDateStr = endDate.toLocaleDateString('es-ES', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+              
+                document.getElementById("hotel-dates").innerText = `Del ${startDateStr} al ${endDateStr}`;
 
                 loadingScreen.style.opacity = '0';
                 loadingScreen.style.pointerEvents = 'none';
