@@ -35,6 +35,9 @@ body {
 
 .card-action {
   background: #ff652f;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 .card-action a {
@@ -157,4 +160,29 @@ body {
 
 #hotel-opinion {
   margin-left: 10px;  /* or any other value that looks good to you */
+}
+
+.action-container {
+  display: flex;
+  justify-content: flex-end; /* Align items to the end of the container */
+  align-items: center;
+  width: 100%;
+}
+
+.price {
+  margin-right: 1em; /* Add some space between the price and the button */
+}
+
+.price {
+  text-align: right;
+}
+
+.price-value {
+  font-size: 1.5em;  /* Make the price font larger */
+  display: block;  /* Make it block-level so it occupies its own line */
+}
+
+.price-text {
+  font-size: 0.8em;  /* Make the text "Precio por noche" smaller */
+  display: block;  /* Make it block-level so it occupies its own line */
 }

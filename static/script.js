@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById("hotel-name").innerText = data.name;
                 document.getElementById("hotel-rating").innerText = `${data.rating}`;
                 document.getElementById("hotel-opinion").innerText = `Basado en ${data.opinion_count}`;
-                document.getElementById("hotel-price").innerText = `Precio por noche: $${data.price}`;
+                document.getElementById("hotel-price-value").innerText = `$${data.price}`;
                 document.getElementById("hotel-location").innerText = `Ubicación: ${data.location}`;
                 document.getElementById("hotel-url").href = data.url;
                 document.getElementById("hotel-url").target = "_blank";
