@@ -1,5 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto', sans-serif;
   background-color: #ffffff;
   margin: 0;
   padding: 0;
@@ -72,10 +75,12 @@ body {
 }
 
 #centered-title {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 700; /* Bold */
+  font-size: 2.5em;
+  margin-bottom: 20px;
   text-align: center;
   margin-top: 20px;
-  font-size: 2em;
-  font-weight: bold;
 }
 
 @media screen and (max-width: 768px) {
@@ -145,3 +150,11 @@ body {
   }
 }
 
+.rating-opinion-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+#hotel-opinion {
+  margin-left: 10px;  /* or any other value that looks good to you */
+}
