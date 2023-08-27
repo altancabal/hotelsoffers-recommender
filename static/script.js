@@ -24,3 +24,10 @@ document.addEventListener('DOMContentLoaded', function () {
             .catch(error => console.error('An error occurred:', error));
     }, 3000); //Wait 3 seconds to display the main screen
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+  const loadingScreen = document.getElementById('loadingScreen');
+  // Existing fetch logic here
+  const elems = document.querySelectorAll('.collapsible');
+  const instances = M.Collapsible.init(elems);
+});

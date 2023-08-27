@@ -34,7 +34,6 @@ body {
 }
 
 .card-action {
-  background: #ff652f;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -66,6 +65,11 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  white-space: normal;
+}
+
+.btn-custom:hover {
+  background-color: #e55b1f;  /* Darkened version of the original color */
 }
 
 
@@ -144,8 +148,9 @@ body {
   
   .card.horizontal .card-image img {
     width: 100%;
-    max-height: 200px;
+    height: auto;
     object-fit: cover;
+    object-position: center;
   }
   
   .card.horizontal {
@@ -200,6 +205,9 @@ body {
     font-size: 0.8em;  /* Make the font a bit smaller */
 }
 
+.btn-more-images:hover {
+  background-color: rgba(0, 0, 0, 0.8); /* Slightly darker semi-transparent black */
+}
 
 @media screen and (min-width: 769px) {
   .card.horizontal .card-image {
@@ -213,4 +221,8 @@ body {
     object-fit: cover;
     object-position: center;
   }
+}
+
+#hotel {
+  margin-bottom: 3em; /* Adjust as necessary */
 }

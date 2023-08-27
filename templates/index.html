@@ -57,26 +57,31 @@
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">¿Cómo funciona nuestro sistema?</span>
-        <p>En Explorador de Viajes monitoreamos constantemente una amplia gama de hoteles en Costa Rica, recolectando datos como precios, ubicación, opiniones de los huéspedes y más. Nuestro avanzado sistema de inteligencia artificial analiza estos datos para seleccionar la mejor opción de hotel para ti. De esta manera, siempre te garantizamos una estancia cómoda, segura y económica.</p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">¿Por qué a veces la oferta no está disponible o el precio es diferente?</span>
-        <p>Las ofertas y precios de hoteles pueden cambiar rápidamente debido a diversos factores como disponibilidad, demanda y promociones especiales. Nuestro sistema actualiza la información con la mayor frecuencia posible, pero hay ocasiones en las que la oferta seleccionada puede haberse agotado o cambiado antes de que puedas realizar la reserva.</p>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">¿Interesado(a) en visitar el mismo hotel en diferentes fechas o buscar un destino distinto?</span>
-        <div class="card-action">
-          <a href="https://www.kayak.co.cr/in?a=explorador&enc_pid=deeplinks&url=/hotels/" target="_blank" class="btn btn-custom">Buscar hoteles aquí</a>
+    <!-- Collapsible wrapper -->
+    <ul class="collapsible">
+      <li>
+        <div class="collapsible-header"><span class="card-title">¿Cómo funciona nuestro sistema?</span></div>
+        <div class="collapsible-body">
+          <span>En Explorador de Viajes monitoreamos constantemente una amplia gama de hoteles en Costa Rica, recolectando datos como precios, ubicación, opiniones de los huéspedes y más. Nuestro avanzado sistema de inteligencia artificial analiza estos datos para seleccionar la mejor opción de hotel para ti. De esta manera, siempre te garantizamos una estancia cómoda, segura y económica.</span>
         </div>
-      </div>
-    </div>
+      </li>
+      <li>
+        <div class="collapsible-header"><span class="card-title">¿Por qué a veces la oferta no está disponible o el precio es diferente?</span></div>
+        <div class="collapsible-body">
+          <span>Las ofertas y precios de hoteles pueden cambiar rápidamente debido a diversos factores como disponibilidad, demanda y promociones especiales. Nuestro sistema actualiza la información con la mayor frecuencia posible, pero hay ocasiones en las que la oferta seleccionada puede haberse agotado o cambiado antes de que puedas realizar la reserva. Regresa mañana temprano para ver otra opción.</span>
+        </div>
+      </li>
+      <li>
+        <div class="collapsible-header"><span class="card-title">¿Interesado(a) en visitar el mismo hotel en diferentes fechas o buscar un destino distinto?</span></div>
+        <div class="collapsible-body">
+          <div class="card-action">
+            <span>Si quieres buscar más opciones de hospedaje, puedes hacerlo a través del siguiente botón.</span>
+            <a href="https://www.kayak.co.cr/in?a=explorador&enc_pid=deeplinks&url=/hotels/" target="_blank" class="btn btn-custom">Hoteles</a>
+          </div>
+        </div>
+      </li>
+    </ul>
+    
   </div>
   <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
