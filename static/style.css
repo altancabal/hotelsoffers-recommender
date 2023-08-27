@@ -16,6 +16,7 @@ body {
 .card-image img {
   max-width: 300px;
   height: 200px;
+  object-fit: cover; /* Preserve aspect ratio */
 }
 
 .card-stacked {
@@ -56,6 +57,9 @@ body {
 .btn-custom {
   background-color: #ff652f;
   color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #logo {
@@ -83,13 +87,23 @@ body {
   }
 
   .card-image img {
-    max-width: 100%;
-    height: auto;
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
   }
 
   .card-stacked {
     flex-direction: column;
     justify-content: flex-start;
+    width: 100%;  /* Add this */
+  }
+
+  .card-content {
+    flex-grow: 1;
+  }
+
+  .card-action {
+    margin-top: auto;
   }
 
   .card-content,
@@ -113,4 +127,20 @@ body {
   #logo {
     width: 40px;
   }
+
+  .card.horizontal .card-image {
+    max-width: 100% !important;
+    overflow: hidden;
+  }
+  
+  .card.horizontal .card-image img {
+    width: 100%;
+    max-height: 200px;
+    object-fit: cover;
+  }
+  
+  .card.horizontal {
+    flex-direction: column !important;
+  }
 }
+
