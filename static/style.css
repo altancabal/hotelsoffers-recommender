@@ -186,3 +186,31 @@ body {
   font-size: 0.8em;  /* Make the text "Precio por noche" smaller */
   display: block;  /* Make it block-level so it occupies its own line */
 }
+
+.position-relative {
+    position: relative;
+}
+
+.btn-more-images {
+    position: absolute;
+    bottom: 10px;  /* Adjust as needed */
+    right: 10px;   /* Adjust as needed */
+    background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent black */
+    color: #fff;
+    font-size: 0.8em;  /* Make the font a bit smaller */
+}
+
+
+@media screen and (min-width: 769px) {
+  .card.horizontal .card-image {
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .card.horizontal .card-image img {
+    height: 100%;
+    width: auto;
+    object-fit: cover;
+    object-position: center;
+  }
+}
