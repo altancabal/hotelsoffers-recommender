@@ -26,6 +26,7 @@ body {
 
 .card-content {
   padding: 20px;
+  font-size: 1em;
 }
 
 .card-action {
@@ -47,11 +48,6 @@ body {
   border-radius: 8px;
 }
 
-.card-content {
-  padding: 20px;
-  font-size: 1em;
-}
-
 .card-title {
   font-size: 1.5em;
   margin-bottom: 20px;
@@ -67,7 +63,7 @@ body {
   top: 10px;
   right: 10px;
   width: 50px;
-  z-index: 101;  /* Makes sure the logo is above other elements */
+  z-index: 101;
 }
 
 #centered-title {
@@ -75,4 +71,46 @@ body {
   margin-top: 20px;
   font-size: 2em;
   font-weight: bold;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    margin-top: 2em;
+  }
+
+  .card {
+    flex-direction: column;
+  }
+
+  .card-image img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .card-stacked {
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .card-content,
+  .card-action {
+    padding: 16px;
+  }
+
+  .card-title,
+  #centered-title {
+    font-size: 1.2em;
+  }
+
+  .rating {
+    font-size: 1em;
+  }
+
+  .btn-custom {
+    padding: 12px 20px;
+  }
+
+  #logo {
+    width: 40px;
+  }
 }
