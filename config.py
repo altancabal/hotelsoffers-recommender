@@ -17,3 +17,6 @@ openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 #Price
 PRICE_LIMIT = 200
+
+#Opinions
+MIN_OPINIONS_LIMIT = 10

@@ -1,5 +1,5 @@
 from bs4 import BeautifulSoup
-from config import SHEET_ID, SHEET_NAME, PRICE_LIMIT
+from config import SHEET_ID, SHEET_NAME, PRICE_LIMIT, MIN_OPINIONS_LIMIT
 from datetime import datetime
 
 import pandas as pd
@@ -21,6 +21,8 @@ def fetchRawPromosInformationFromGSheets():
 def formatPrice(price_str):
   return int(price_str.replace('$', '').replace(' ', '').replace(',', '').replace('.', '').replace('*', ''))
 
+def getIntOpinionsValue(opinions_str):
+  return int(opinions_str.replace(' opiniones', '').replace(' opinión', '').replace(',', '').replace('.', ''))
 
 def extract_alt_with_regex(html_content):
     # Modified regex to account for escaped quotes and capture content within
@@ -106,6 +108,10 @@ def is_valid_row(row):
         if field == "price" and formatPrice(row[field]) > PRICE_LIMIT:
             return False
 
+        #Specific check for opinions count
+        if field == "opinion_count" and getIntOpinionsValue(row[field]) < MIN_OPINIONS_LIMIT:
+            return False
+      
         if field == "fetched_date" and row[field] != datetime.today().strftime('%Y-%m-%d'):
             return False
 
