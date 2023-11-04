@@ -2,6 +2,7 @@ from datetime import datetime
 
 import json
 import openai
+import re
 import utils
 
 def getTop5RecommendedHotels(hotels):
@@ -19,6 +20,11 @@ def getTop5RecommendedHotels(hotels):
     return top5Hotels
 
 
+def parse_uuids_from_gpt_response(response):
+    return re.findall(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}', response)
+
+
+
 def getTopRecommendedHotelFromGPT(hotels_str, start_date, end_date):
   today_date = datetime.today().strftime('%Y-%m-%d')
   completion = openai.ChatCompletion.create(
@@ -34,6 +40,6 @@ def getTopRecommendedHotelFromGPT(hotels_str, start_date, end_date):
   print("GPT RESPONSE")
   print(content)
   
-  uuid_list = json.loads(content)
+  uuid_list = parse_uuids_from_gpt_response(content)
 
   return uuid_list

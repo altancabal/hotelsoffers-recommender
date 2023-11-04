@@ -47,7 +47,7 @@ def store_hotel(hotel):
           "Name": {"title": [{"text": {"content": hotel["name"]}}]},
           "Price": {"number": hotel["price"]},
           "Opinions": {"number": opinion_number},
-          "Location": {"rich_text": [{"text": {"content": hotel["location"]}}]},
+          "Location": {"rich_text": [{"text": {"content": "Desconocido"}}]},
           "Top provider": {"rich_text": [{"text": {"content": hotel["top_provider"]}}]},
           "Promo URL": {"url": hotel["url"]},
           "Rating": {"number": rating},

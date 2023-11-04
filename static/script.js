@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 document.getElementById("hotel-rating").innerText = `${data.rating}`;
                 document.getElementById("hotel-opinion").innerText = `Basado en ${data.opinion_count}`;
                 document.getElementById("hotel-price-value").innerText = `$${data.price}`;
-                document.getElementById("hotel-location").innerText = `Ubicado en ${data.location}`;
+                document.getElementById("hotel-location").innerText = `Costa Rica`;
                 document.getElementById("hotel-url").href = data.url;
                 document.getElementById("hotel-url").target = "_blank";
                 document.getElementById("more-images-link").href = data.url;

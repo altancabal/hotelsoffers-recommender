@@ -15,7 +15,7 @@ def fetchHotelsInformationFromGSheets():
 
 def fetchRawPromosInformationFromGSheets():
   url = f'https://docs.google.com/spreadsheets/d/{SHEET_ID}/gviz/tq?tqx=out:csv&sheet={SHEET_NAME}'
-  return pd.read_csv(url, names=["name", "price", "opinion_count", "location", "top_provider", "url", "rating", "img_html", "fetched_date"])
+  return pd.read_csv(url, names=["name", "price", "opinion_count", "top_provider", "url", "rating", "img_url", "fetched_date"])
 
 
 def formatPrice(price_str):
@@ -35,10 +35,11 @@ def createHotelDataFromPandaRow(row):
     row = row.copy()
     row['uuid'] = str(uuid.uuid4())
     row['price'] = formatPrice(row['price'])
+    row['location'] = 'Desconocido'
     
-    fields_to_strip = ['name', 'opinion_count', 'location', 'top_provider', 'url', 'rating']
+    fields_to_strip = ['name', 'opinion_count', 'top_provider', 'url', 'rating']
     for field in fields_to_strip:
-        row[field] = row[field].strip()
+      row[field] = row[field].strip()
 
     # Modify URL
     base_url = "https://www.kayak.co.cr/in?a=explorador&enc_pid=deeplinks&url="
@@ -51,21 +52,6 @@ def createHotelDataFromPandaRow(row):
     if dates:
         row['start_date'] = dates.group(1)
         row['end_date'] = dates.group(2)
-
-    img_html = row.get('img_html', '')
-    if isinstance(img_html, str):
-        formatted_html = img_html.replace('\\"', '"')  # Convert escaped quotes to actual quotes
-        soup = BeautifulSoup(formatted_html, 'html.parser')
-        img_tag = soup.find('img')
-        if img_tag:
-            row['img_url'] = img_tag.get('src', '')  # No need to replace quotes as we already did that
-            alt_text = img_tag.get('alt')
-            if alt_text:
-                row['name'] = alt_text
-
-    # Delete the 'image_url' key
-    if 'img_html' in row:
-        del row['img_html']
 
     return row.to_dict()
 
@@ -90,7 +76,7 @@ def getHotelDict(raw_pd):
 
 def is_valid_row(row):
     # List of required fields
-    required_fields = ["name", "price", "opinion_count", "location", "top_provider", "url", "rating", "img_html", "fetched_date"]
+    required_fields = ["name", "price", "opinion_count", "top_provider", "url", "rating", "img_url", "fetched_date"]
     
     # Check if each field exists and is not empty
     for field in required_fields:
